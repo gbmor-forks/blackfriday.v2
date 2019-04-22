@@ -92,6 +92,11 @@ type HTMLRendererParameters struct {
 	CSS   string // Optional CSS file URL (used if CompletePage is set)
 	Icon  string // Optional icon file URL (used if CompletePage is set)
 
+	// Optional <meta .../> tags for the document header
+	// uses the format - k: name="author"
+	//									 v: foo barrington
+	Meta map[string]string
+
 	Flags HTMLFlags // Flags allow customizing this renderer's behavior
 }
 
@@ -867,6 +872,13 @@ func (r *HTMLRenderer) writeDocumentHeader(w io.Writer) {
 	io.WriteString(w, "  <meta charset=\"utf-8\"")
 	io.WriteString(w, ending)
 	io.WriteString(w, ">\n")
+	if r.Meta != nil {
+		for k, v := range r.Meta {
+			io.WriteString(w, "  <meta "+k+" content=\""+v+"\"")
+			io.WriteString(w, ending)
+			io.WriteString(w, ">\n")
+		}
+	}
 	if r.CSS != "" {
 		io.WriteString(w, "  <link rel=\"stylesheet\" type=\"text/css\" href=\"")
 		escapeHTML(w, []byte(r.CSS))
